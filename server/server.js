@@ -13,7 +13,7 @@ const app = express();
 
 // Middleware - apply these BEFORE routes
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: process.env.CLIENT_URL || ['http://localhost:3000', 'https://coderworld-7vm3.onrender.com'],
   credentials: true
 }));
 app.use(express.json());
@@ -161,17 +161,15 @@ const internshipRoutes = require('./routes/internship');
 const adminRoutes = require('./routes/admin');
 const feedbackRoutes = require('./routes/feedback');
 const consultationRoutes = require('./routes/consultation');
-const visitorRoutes = require('./routes/visitor'); // ADD THIS LINE
+const visitorRoutes = require('./routes/visitor');
 
 // Use routes
 app.use('/api/internship', internshipRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/consultation', consultationRoutes);
-// Add this with other routes
 app.use('/api/contact', require('./routes/contact'));
-app.use('/api/visitor', visitorRoutes); // ADD THIS LINE
-// Add with other routes
+app.use('/api/visitor', visitorRoutes);
 app.use('/api/careers', require('./routes/career'));
 
 // Health check route
@@ -183,6 +181,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React frontend
+  const clientBuildPath = path.join(__dirname, '../client/build');
+  
+  if (fs.existsSync(clientBuildPath)) {
+    console.log('✅ Serving static files from:', clientBuildPath);
+    app.use(express.static(clientBuildPath));
+    
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    });
+  } else {
+    console.warn('⚠️ Client build directory not found at:', clientBuildPath);
+    console.warn('Current directory:', __dirname);
+    console.warn('Files in directory:', fs.readdirSync(__dirname));
+  }
+}
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
@@ -193,11 +211,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
   res.status(404).json({ 
     success: false, 
-    message: 'Route not found',
+    message: 'API route not found',
     path: req.originalUrl 
   });
 });
