@@ -2,48 +2,30 @@
   "name": "coding-world",
   "version": "1.0.0",
   "description": "Coding World - Full Stack Portfolio with Internship System",
-  "private": true,
+  "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "server": "node server/server.js",
+    "server": "nodemon server/server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
-    "server:dev": "nodemon server/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-client": "npm install --prefix client",
     "install-server": "npm install --prefix server",
     "install-all": "npm install && npm run install-client && npm run install-server",
     "build": "npm run build --prefix client",
-    "build:client": "npm run build --prefix client",
-    "build:server": "npm run build --prefix server",
-    "prod": "NODE_ENV=production npm run start",
-    "clean": "rm -rf node_modules client/node_modules server/node_modules",
-    "clean:all": "npm run clean && rm -rf client/build server/uploads",
-    "heroku-postbuild": "npm run install-client && npm run build:client"
+    "postbuild": "echo \"Build completed\"",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client",
+    "render-postbuild": "npm install --prefix client && npm run build --prefix client",
+    "prod": "NODE_ENV=production npm start"
   },
-  "keywords": [
-    "react",
-    "node",
-    "mongodb",
-    "portfolio",
-    "internship",
-    "fullstack"
-  ],
+  "keywords": ["react", "node", "mongodb", "portfolio", "internship"],
   "author": "Coding World",
   "license": "MIT",
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
-  },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.3"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yourusername/coding-world.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/coding-world/issues"
-  },
-  "homepage": "https://github.com/yourusername/coding-world#readme"
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  }
 }
